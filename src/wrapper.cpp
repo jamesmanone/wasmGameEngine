@@ -2,9 +2,15 @@
 #include "renderer.h"
 
 Wrapper* Wrapper::me = nullptr;
+int Wrapper::w = 0;
+int Wrapper::h = 0;
 
-int Wrapper::w = 1280;
-int Wrapper::h = 720;
+
+Wrapper::Wrapper() : renderer(w, h) {
+  Javascript::print("Wrapper created!");
+  if(w == 0 || h == 0) Javascript::print("no HxW");
+  lastT = Javascript::now();
+}
 
 Wrapper* Wrapper::get() {
   if(me == nullptr) me = new Wrapper();
@@ -17,7 +23,13 @@ void Wrapper::setDimensions(int _w, int _h) {
 }
 
 void Wrapper::step() {
-  renderer.randomFrame();
+  double deltaT = Javascript::now() - lastT;
+  if(deltaT >= 3000.0f) {
+    lastT += deltaT;
+    geo = !geo;
+  }
+  if(geo) renderer.geometryTestFrame();
+  else renderer.randomFrame();
   renderer.print();
 }
 

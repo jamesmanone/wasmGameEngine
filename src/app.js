@@ -3,8 +3,12 @@
 
   const c = document.createElement('canvas');
   const ctx = c.getContext("2d");
-  c.height = 720;
-  c.width = 1280;
+  c.height = window.innerHeight >= 720 ? 720 : window.innerHeight;
+  if(window.innerWidth >= (c.height/9)*16) c.width = (c.height/9)*16;
+  else {
+    c.width = window.innerWidth;
+    c.height = (c.width/16)*9;
+  }
 
   document.getElementsByTagName('body')[0].appendChild(c);
 

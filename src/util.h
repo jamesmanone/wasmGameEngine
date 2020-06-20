@@ -4,12 +4,19 @@
 #include <string>
 
 extern "C" {
-  extern void drawScreen(uint32_t pointer, int width);
   extern void println(uint32_t pointer);
 };
 
 namespace Javascript {
   void print(const char *s);
+  extern "C" {
+    extern double now(void);
+    extern void drawScreen(uint32_t pointer, int width);
+  }
+}
+
+namespace util {
+  int abs(int);
 }
 
 #endif

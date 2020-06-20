@@ -9,11 +9,13 @@ public:
   void step();
   static void setDimensions(int w, int h);
 private:
-  Wrapper() : renderer(w, h) { Javascript::print("Wrapper created!"); }
+  Wrapper();
   static Wrapper *me;
   Renderer renderer;
   static int w;
   static int h;
+  double lastT;
+  bool geo{false};
 };
 
 #endif

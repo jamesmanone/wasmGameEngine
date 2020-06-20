@@ -29,7 +29,10 @@ class Handler {
 
   loop() {
     this.instance.exports.step();
+  }
 
+  now() {
+    return performance.now();
   }
 
   getWasm() {
@@ -38,9 +41,11 @@ class Handler {
       .then(bytes => WebAssembly.instantiate(bytes, {
         env: {
           memory: new WebAssembly.Memory({initial: 256, maximum: 32768}),
-        drawScreen: this.drawScreen.bind(this),
-        println: this.println.bind(this),
-        emscripten_notify_memory_growth: () => {}
+          drawScreen: this.drawScreen.bind(this),
+          println: this.println.bind(this),
+          now: this.now,
+          _ZN3v2dIiED1Ev: n => n,
+          emscripten_notify_memory_growth: () => {}
         },
         wasi_snapshot_preview1: {
           proc_exit: n=>{}
@@ -50,7 +55,11 @@ class Handler {
         this.instance = instance;
         this.memory = new Uint8Array(instance.exports.memory.buffer);
       })
-      .then(() => setInterval(this.instance.exports.step, 20));
+      // .then(() => setInterval(this.instance.exports.step, 20))
+      .then(() => {
+        this.instance.exports.setWH(this.width, this.height);
+        while(1) this.instance.exports.step();
+      });
   }
 
   

@@ -1,6 +1,7 @@
 #include "util.h"
 
 namespace Javascript {
+
   void print(const char *s) {
     int length = strlen(s);
       char* o;
@@ -9,4 +10,14 @@ namespace Javascript {
       *(o+length) = '\0';
       println((uint32_t)o);
   }
+
+}
+
+namespace util {
+
+  int abs(int n) {
+    int const mask = n >> 31;
+    return (n + mask) ^ mask;
+  }
+
 }

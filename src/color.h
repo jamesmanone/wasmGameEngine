@@ -6,7 +6,7 @@
 class Color {
 public:
   Color();
-  Color(uint8_t r, uint8_t g, uint8_t b) : color(r|(g<<8)|(b<<16)|0xFF00000000) { }
+  Color(uint8_t r, uint8_t g, uint8_t b) : color(r|(g<<8)|(b<<16)|0xFF000000) { }
   Color(uint8_t r, uint8_t g, uint8_t b, uint8_t a) : color(r|(g<<8)|(b<<16)|(a<<24)) { }
   Color(uint32_t c) : color(c) { }
 
