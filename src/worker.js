@@ -2,24 +2,18 @@ class Handler {
   constructor(w, h) {
     this.width = w;
     this.height = h;
-    this.getWasm.bind(this)()
+    // this.memory = new WebAssembly.Memory({initial: 256, maximum: 32768, shared: true});
+    // self.postMessage(this.memory);
+    this.getWasm.bind(this)();
   }
 
   drawScreen(pointer, w) {
-
-    let fb = new Uint8ClampedArray(this.instance.exports.memory.buffer, pointer, this.width*this.height*4);
-
-    let buff = new ArrayBuffer(this.width * this.height * 4)
-    let fb2 = new Uint8ClampedArray(buff);
-  
-    fb.forEach((v, i) => fb2[i] = v);
-
-    self.postMessage({type: "frame", data: fb2}, [buff]);
+    self.postMessage({pointer: pointer, w: w});
   }
 
   println(pointer) {
     const line = [];
-    const buffer = new Uint8Array(this.instance.exports.memory.buffer, pointer);
+    const buffer = new Uint8Array(this.memory.buffer, pointer);
     let i = 0;
     while(buffer[i] != 0) line.push(buffer[i++])
     this.instance.exports.free(pointer);
@@ -35,17 +29,21 @@ class Handler {
     return performance.now();
   }
 
+  onGrowMemory() {
+    self.postMessage(this.memory);
+  }
+
   getWasm() {
-    fetch("/tst.wasm")
+    fetch("/multithreaded.wasm")
       .then(r => r.arrayBuffer())
       .then(bytes => WebAssembly.instantiate(bytes, {
         env: {
-          memory: new WebAssembly.Memory({initial: 256, maximum: 32768}),
+          // memory: this.memory,
           drawScreen: this.drawScreen.bind(this),
           println: this.println.bind(this),
           now: this.now,
           _ZN3v2dIiED1Ev: n => n,
-          emscripten_notify_memory_growth: () => {}
+          emscripten_notify_memory_growth: this.onGrowMemory.bind(this)
         },
         wasi_snapshot_preview1: {
           proc_exit: n=>{}
@@ -53,12 +51,12 @@ class Handler {
       }))
       .then(({instance}) => {
         this.instance = instance;
-        this.memory = new Uint8Array(instance.exports.memory.buffer);
+        this.memory = this.instance.exports.memory;
+        self.postMessage(this.memory);
       })
-      // .then(() => setInterval(this.instance.exports.step, 20))
       .then(() => {
         this.instance.exports.setWH(this.width, this.height);
-        while(1) this.instance.exports.step();
+        this.instance.exports.go();
       });
   }
 

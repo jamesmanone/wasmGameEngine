@@ -1,11 +1,29 @@
 #include "renderer.h"
 #include <cmath>
 #include <string>
+#include "path.h"
 
-uint32_t Renderer::nLehmer = 0;
+
 
 Renderer::Renderer(int w, int h) :
-  w(w), h(h), frameBuffer(new uint32_t[w*h]) { }
+  w(w), h(h), frameBuffer(new uint32_t[w*h]), frame(new uint32_t[w*h]) {
+    test.push(vec(0, -12));
+    test.push(vec(10, 10));
+    test.push(vec(10, 12));
+    test.push(vec(8, 12));
+    test.push(vec(8, 10));
+    test.push(vec(5, 5));
+    test.push(vec(-5, 5));
+    test.push(vec(-8, 10));
+    test.push(vec(-8, 12));
+    test.push(vec(-10, 12));
+    test.push(vec(-10, 10));
+  }
+
+  void Renderer::print() {
+    memcpy(frame.get(), frameBuffer.get(), w*h*4);
+    Javascript::drawScreen((uint32_t)frame.get(), w); 
+  }
 
 void Renderer::clearScreen(Color &c) {
   int l = w*h;
@@ -13,13 +31,7 @@ void Renderer::clearScreen(Color &c) {
 }
 
 uint32_t Renderer::getRand() {
-  nLehmer += 0xE120FC15;
-  uint64_t tmp{nLehmer + 0x4A39b70D};
-  uint32_t m1 = (tmp>>32)^tmp;
-  tmp = (uint64_t)m1 * 0x12FAD5C9;
-  uint32_t m2 = (tmp>>32)^tmp;
-  return m2;
-  // return ((rand()&0xFFFF)<<16)|(rand()&0xFFFF);
+  return ((rand()&0xFFFF)<<16)|(rand()&0xFFFF);
 }
 
 void Renderer::randomFrame() {
@@ -128,6 +140,12 @@ void Renderer::fillCircle(vec cvec, int r, Color &c) {
   }
 }
 
+void Renderer::drawPath(vec orig, Path<int> &p, Color &c) {
+  int points = p.size();
+  for(int i = 1; i < points; ++i) drawLine(p[i-1] + orig, p[i] + orig, c);
+  drawLine(p[0] + orig, p[points-1] + orig, c);
+}
+
 void Renderer::geometryTestFrame() {
   Color fill(0x10, 0x10, 0x10),
         blank(0, 0, 0),
@@ -164,6 +182,8 @@ void Renderer::geometryTestFrame() {
   drawCircle(vec(0, h/2), h/2 -1, c5);
   drawCircle(vec(w, h/2), h/2, c5);
   drawCircle(vec(w, h/2), h/2 -1, c5);
+
+  drawPath(vec(w/2, (h/4)*3), test, white);
 }
 
 

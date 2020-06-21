@@ -9,11 +9,13 @@ public:
   v2d<T>(v2d<T> const &b) : _x(b.x()), _y(b.y()) { }
   ~v2d();
 
+
   T x() const { return _x; }
   void x(T x) { _x = x; }
   T y() const { return _y; }
   void y(T y) { _y = y; }
 
+  v2d<T> &operator=(v2d<T> &b) { _x = b.x(); _y = b.y(); return *this; }
   T &operator[](int i) { return i = 0 ? _x : _y; }
   v2d<T> operator+(v2d<T> b) { return v2d<T>(_x+b.x(), _y+b.y()); }
   v2d<T> &operator++() { ++_x; ++_y; return *this; }

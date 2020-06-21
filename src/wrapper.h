@@ -16,6 +16,7 @@ private:
   static int h;
   double lastT;
   bool geo{false};
+  int frames{0};
 };
 
 #endif

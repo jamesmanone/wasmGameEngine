@@ -6,6 +6,7 @@
 #include "util.h"
 #include "v2d.h"
 #include "util.h"
+#include "path.h"
 
 typedef v2d<int> vec;
 
@@ -19,8 +20,7 @@ public:
   void randomFrame();
   void geometryTestFrame();
 
-  void print() { Javascript::drawScreen((uint32_t)frameBuffer.get(), w); }
-
+  void print();
   void setPixel(vec p, Color &c);
   void drawLine(vec p1, vec p2, Color &c);
   void drawRect(vec orig, vec size, Color &c);
@@ -28,7 +28,7 @@ public:
   void fillRect(vec orig, vec size, Color &c);
   void drawCircle(vec cvec, int r, Color &c);
   void fillCircle(vec cvec, int r, Color &c);
-  // void drawPath();
+  void drawPath(vec orig, Path<int> &p, Color &c);
 
 
   static uint32_t getRand();
@@ -36,8 +36,11 @@ private:
 
   int w;
   int h;
+  int lock{0};
   std::unique_ptr<uint32_t[]> frameBuffer;
-  static uint32_t nLehmer;
+  std::unique_ptr<uint32_t[]> frame;
+  Path<int> test;
+
 
 };
 

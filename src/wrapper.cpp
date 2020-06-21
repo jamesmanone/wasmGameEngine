@@ -1,5 +1,6 @@
 #include "wrapper.h"
 #include "renderer.h"
+#include <string>
 
 Wrapper* Wrapper::me = nullptr;
 int Wrapper::w = 0;
@@ -25,13 +26,19 @@ void Wrapper::setDimensions(int _w, int _h) {
 void Wrapper::step() {
   double deltaT = Javascript::now() - lastT;
   if(deltaT >= 3000.0f) {
+    double fps = frames/(deltaT/1000);
     lastT += deltaT;
     geo = !geo;
+    frames = 0;
+    Javascript::print((std::to_string(fps) + " fps").c_str());
   }
+  ++frames;
   if(geo) renderer.geometryTestFrame();
   else renderer.randomFrame();
   renderer.print();
 }
+
+
 
 
 extern "C" {
@@ -44,6 +51,10 @@ extern "C" {
   }
 
   void _free(void* p) { free(p); }
+
+  void go() {
+    while(1) Wrapper::get()->step();
+  }
 };
 
 
